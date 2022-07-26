@@ -1,13 +1,13 @@
-import { StyleSheet, Button, Image, Text, Pressable } from "react-native";
+import { StyleSheet, Image, Text } from "react-native";
+import { Button } from "../components";
 
 import EditScreenInfo from "../components/EditScreenInfo";
 import { Text as ThemedText, View } from "../components/Themed";
-import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 
 export default function Authentication({ navigation }: any) {
-  const navigate = useNavigation();
+  const navigate = useNavigation<any>();
   //Need to implement logic here
   const UserHasAuthenticated = false;
   if (UserHasAuthenticated) {
@@ -33,12 +33,9 @@ export default function Authentication({ navigation }: any) {
         lightColor="#eee"
         darkColor="rgba(255,255,255,0.1)"
       />
-      <Pressable
-        style={styles.verify}
-        onPress={() => navigate.navigate("PhotoID")}
-      >
+      <Button onPress={() => navigate.navigate("PhotoID")}>
         <Text style={styles.body}>Start Verification Process</Text>
-      </Pressable>
+      </Button>
     </View>
   );
 }
@@ -48,6 +45,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "white",
   },
   title: {
     fontSize: 20,
@@ -58,14 +56,6 @@ const styles = StyleSheet.create({
     marginVertical: 30,
     height: 1,
     width: "80%",
-  },
-  verify: {
-    backgroundColor: "#4fbe37",
-    textAlign: "center",
-    justifyContent: "center",
-    padding: 10,
-    elevation: 1,
-    borderRadius: 8,
   },
   body: {
     color: "white",
