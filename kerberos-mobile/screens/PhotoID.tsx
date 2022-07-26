@@ -1,14 +1,9 @@
-import { StyleSheet, Button, Image } from "react-native";
-
-import EditScreenInfo from "../components/EditScreenInfo";
-import { Text, View } from "../components/Themed";
-import { RootTabScreenProps } from "../types";
-import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
+import { StyleSheet, Button, Image } from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import { View, Text } from "react-native";
 
-export default function TabOneScreen({
-  navigation,
-}: RootTabScreenProps<"TabOne">) {
+export default function PhotoID({ navigation, route }: any) {
   const [image, setImage] = useState<any>(null);
 
   const pickImage = async () => {
@@ -28,7 +23,7 @@ export default function TabOneScreen({
   };
 
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+    <View style={styles.container}>
       <Button title="Pick an image from camera roll" onPress={pickImage} />
       {image && (
         <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />
@@ -36,7 +31,6 @@ export default function TabOneScreen({
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
