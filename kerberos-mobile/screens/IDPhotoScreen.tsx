@@ -5,7 +5,7 @@ import * as ImagePicker from "expo-image-picker";
 import { View, Text } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-export default function PhotoID({ navigation, route }: any) {
+export default function IDPhoto({ navigation, route }: any) {
   const [image, setImage] = useState<any>(null);
   const [status, requestPermission] = ImagePicker.useCameraPermissions();
   const navigate = useNavigation<any>();
@@ -66,7 +66,7 @@ export default function PhotoID({ navigation, route }: any) {
             <Button
               style={styles.rightButton}
               onPress={async () =>
-                navigate.navigate("IdAnalyser", { imageURI: image })
+                navigate.navigate("IDAnalyser", { imageURI: image })
               }
             >
               Continue

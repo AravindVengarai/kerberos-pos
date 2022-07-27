@@ -4,7 +4,7 @@ import { Platform, StyleSheet, Text } from "react-native";
 import EditScreenInfo from "../components/EditScreenInfo";
 import { View } from "../components/Themed";
 
-export default function ModalScreen() {
+export default function Modal() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Authentication</Text>

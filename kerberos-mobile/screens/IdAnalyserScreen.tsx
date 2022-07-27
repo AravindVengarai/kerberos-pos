@@ -3,14 +3,14 @@ import { StyleSheet, Image, Alert } from "react-native";
 import { Button } from "../components";
 import { View, Text, ActivityIndicator } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import Scan from "../integrations/IDAuth";
-export default function IdAnalyser({ navigation, route }: any) {
+import ScanId from "../integrations/IDAuth";
+export default function IDAnalyser({ navigation, route }: any) {
   const { imageURI } = route.params;
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any>([]);
   const navigate = useNavigation<any>();
   useEffect(() => {
-    Scan(imageURI)
+    ScanId(imageURI)
       .then((res) => {
         console.log("Got it");
         console.log(res);
@@ -27,11 +27,16 @@ export default function IdAnalyser({ navigation, route }: any) {
             );
           }
         }
+        else {
+            Alert.alert("Unable to Validate", res?.error.message ?? "Could not verify your ID", [
+                { text: "Try Again", onPress: () => navigate.goBack() },
+            ]);
+        }
       })
       .catch((e: any) => {
         console.log("Did not get it");
         console.log(e);
-        Alert.alert("Unexpected Error", "Hi", [
+        Alert.alert("Unexpected Error", "Something unexpected happened. Please try again", [
           { text: "Try Again", onPress: () => navigate.goBack() },
         ]);
       });
@@ -40,7 +45,7 @@ export default function IdAnalyser({ navigation, route }: any) {
     <View style={styles.container}>
       <View style={styles.topContainer}>
         <Text style={styles.title}>Verifying your ID</Text>
-        <Text style={styles.body}> Hold On </Text>
+        {loading && <Text style={styles.body}> Hold On </Text>}
       </View>
       <View style={styles.bottopContainer}>
         {loading ? (
@@ -55,6 +60,7 @@ export default function IdAnalyser({ navigation, route }: any) {
           <>
             <Text>Authenticity: {data.authentication.score}</Text>
             <Text>Issue Date: {data.result?.issued}</Text>
+            <Button onPress={()=>navigate.navigate('FacePhoto', {ID_URI: imageURI})}> Continue</Button>
           </>
         )}
       </View>

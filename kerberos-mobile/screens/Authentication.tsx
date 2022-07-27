@@ -33,7 +33,7 @@ export default function Authentication({ navigation }: any) {
         lightColor="#eee"
         darkColor="rgba(255,255,255,0.1)"
       />
-      <Button onPress={() => navigate.navigate("PhotoID")}>
+      <Button onPress={() => navigate.navigate("IDPhoto")}>
         <Text style={styles.body}>Start Verification Process</Text>
       </Button>
     </View>

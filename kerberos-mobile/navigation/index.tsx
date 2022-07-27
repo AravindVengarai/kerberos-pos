@@ -13,15 +13,10 @@ import {
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as React from "react";
 import { ColorSchemeName, Pressable, Text } from "react-native";
-import IdAnalyser from "../screens/IdAnalyserScreen";
+import { Authentication, FaceAnalyser, FacePhoto, IDAnalyser, IDPhoto, Modal, TabTwoScreen } from "../screens";
 
 import Colors from "../constants/Colors";
 import useColorScheme from "../hooks/useColorScheme";
-import ModalScreen from "../screens/ModalScreen";
-import NotFoundScreen from "../screens/NotFoundScreen";
-import TabTwoScreen from "../screens/TabTwoScreen";
-import Authentication from "../screens/Authentication";
-import PhotoID from "../screens/PhotoID";
 
 export default function Navigation({
   colorScheme,
@@ -50,18 +45,23 @@ function RootNavigator() {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="NotFound"
-        component={NotFoundScreen}
-        options={{ title: "Oops!" }}
-      />
-      <Stack.Screen
-        name="IdAnalyser"
-        component={IdAnalyser}
+        name="IDPhoto"
+        component={IDPhoto}
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="PhotoID"
-        component={PhotoID}
+        name="IDAnalyser"
+        component={IDAnalyser}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="FacePhoto"
+        component={FacePhoto}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="FaceAnalyser"
+        component={FaceAnalyser}
         options={{ headerShown: false }}
       />
       <Stack.Group screenOptions={{ presentation: "modal" }}>
@@ -70,7 +70,7 @@ function RootNavigator() {
           options={{
             title: "Authentication Info",
           }}
-          component={ModalScreen}
+          component={Modal}
         />
       </Stack.Group>
     </Stack.Navigator>
