@@ -33,7 +33,6 @@ export interface itemObject {
   label?: string;
   price?: number;
 }
-let buttonClose = false;
 const Patron = { barcode: 11, type: "Alcohol", label: "Patron", price: 29.99 };
 const Henny = { barcode: 12, type: "Alcohol", label: "Hennessy", price: 26.99 };
 const Newport = {
@@ -44,7 +43,6 @@ const Newport = {
 };
 const Powerade = { barcode: 14, type: "Drink", label: "Powerade", price: 1.99 };
 const Deli = { barcode: 15, type: "food", label: "Deli", price: 5.99 };
-
 let video: any;
 let imageUpload: any;
 let res: any;
@@ -61,6 +59,7 @@ const Checkout = () => {
   const [isLoyal, setisLoyal] = useState(false);
   const [restricted, setRestricted] = useState(false);
   const [loyaltyId, setLoyaltyId] = useState("");
+  const [openDialog, setOpenDialog] = useState(false);
   const [currentItem, setCurrentItem] = useState({
     barcode: 1,
     type: "none",
@@ -164,17 +163,24 @@ const Checkout = () => {
     if (res !== undefined && res === "Karan") {
       additems((arr) => [...arr, currentItem]);
       setNeedToCheck(true);
+      setOpenDialog(true);
+    }
+    if (res !== undefined && res !== "Karan") {
+      setOpenDialog(true);
+      setNeedToCheck(false);
     }
     // setTimeout(() => {
   }, [res]);
   return (
     <Box sx={{ backgroundColor: "#DAEAF9", height: "100vh" }}>
       {restricted && checkID()}
-      <Dialog open={needToCheck && !buttonClose} >
-        <Button onClick={() => (buttonClose = true)} >
-          Age has been Verified <CheckCircleSharpIcon />        Tap to Continue
-
-        </Button>
+      <Dialog open={openDialog}>
+      {needToCheck?
+        <Button onClick={() => setOpenDialog(false)}>
+          Age has been Verified <CheckCircleSharpIcon /> Tap to Continue
+        </Button>:<Button onClick={() => setOpenDialog(false)}>
+          Age not Verified! Tap to Continue
+        </Button> }
       </Dialog>
       <Stack
         direction="row"
