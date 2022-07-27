@@ -20,6 +20,7 @@ import LocalDrinkIcon from "@mui/icons-material/LocalDrink";
 import SmokingRoomsIcon from "@mui/icons-material/SmokingRooms";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import { getThemeProps } from "@mui/system";
+import Webcam from "react-webcam";
 
 export interface itemObject {
   barcode?: number;
@@ -79,30 +80,43 @@ const numberFormat = (value: number) =>
   const [toggle, setToggle] = useState(false);
 
   const getPicture = async () => {
-    let temp = document.createElement('a');
-    video = ref.current;
-    const myCanvas: any = document.createElement('canvas');
-    myCanvas.getContext('2d').drawImage(video, 0, 0, video.width, video.height);
-    const mblob = myCanvas.toBlob(function(blob: Blob) {
+    //let temp = document.createElement('a');
+    video = document.querySelector('#videoInput')
+    console.log('video');
+    console.log(video);
+    // video = ref.current;
+    console.log(video);
+    let canvas = document.createElement('canvas');
+    let ctx = canvas.getContext('2d');
+    console.log('ctx');
+    console.log(ctx);
+    ctx!.canvas.width = 720;
+    ctx!.canvas.height = 550;
+    ctx!.drawImage(video, 0, 0, 720, 550);
+    canvas.toBlob(function(blob: any) {
 				imageUpload = new File([blob], 'test.jpg', { type: 'image/jpeg' });
 			}, 'image/jpeg');
-    temp.setAttribute('href', URL.createObjectURL(mblob));
-    temp.setAttribute('download', 'trial.jpeg');
+    // temp.setAttribute('href', URL.createObjectURL(mblob));
+    // temp.setAttribute('download', 'trial.jpeg');
     console.log('imageUpload in getPicture');
     console.log(imageUpload);
-  }
-
-  useEffect(() => {
-    getPicture();
-
     Promise.all([
       faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
       faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
       faceapi.nets.ssdMobilenetv1.loadFromUri('/models') //heavier/accurate version of tiny face detector
-    ]).then(start)
+    ]).then(start);
+  }
+
+  useEffect(() => {
+  if(toggle){
+    getPicture();
+    console.log('made it');
+    setToggle(false);
+  }
   }, [toggle]);
 
   useEffect(() => {
+    video = ref.current;
     navigator.mediaDevices.getUserMedia({ video: true }).then(
       function(stream) {
           video.srcObject = stream;
