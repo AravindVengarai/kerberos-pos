@@ -11,9 +11,11 @@ import {
   ButtonGroup,
   TextField,
   Icon,
+  Dialog,
 } from "@mui/material";
+import 'react-simple-keyboard/build/css/index.css';
+import Keyboard from "react-simple-keyboard";
 import LiquorIcon from "@mui/icons-material/Liquor";
-import Current from "../Components/Current";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import Webcam from "react-webcam";
 import Order from "../Components/Order";
@@ -26,23 +28,31 @@ export interface itemObject {
   label?: string;
   price?: number;
 }
-const alcohol = { barcode: 1, type: "Alcohol", label: "Patron", price: 59.99 };
+const Patron = { barcode: 11, type: "Alcohol", label: "Patron", price: 29.99 };
+const Henny = { barcode: 12, type: "Alcohol", label: "Hennessy", price: 26.99 };
+const Newport = { barcode: 13, type: "Cigarrettes", label: "Newports", price: 8.99 };
+const Powerade =  { barcode: 14, type: "Drink", label: "Powerade", price: 1.99 };
+const Deli =  { barcode: 15, type: "food", label: "Deli", price: 5.99 };
+
+
 const Checkout = () => {
   const numberFormat = (value: number) =>
     new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
     }).format(value);
+  const [needToCheck, setNeedToCheck] = useState(false);
+  const [beenChecked, setBeenChecked] = useState(false);
   const [loyal, setLoyal] = useState(false);
   const [total, setTotal] = useState(0);
   const [isLoyal, setisLoyal] = useState(false);
+  const [loyaltyId, setLoyaltyId] = useState('');
   const [currentItem, setCurrentItem] = useState({
     barcode: 1,
     type: "none",
     label: "none",
     price: 0,
   });
-  const [firstInstance, setfirstInstance] = useState(false);
   const [items, additems] = useState([
     { barcode: 0, type: "type", label: "Item Label", price: 0 },
   ]);
@@ -56,7 +66,11 @@ const Checkout = () => {
     }
     setTotal(cnt);
   }, [items]);
-  useEffect(() => {}, [currentItem]);
+  useEffect(() => {
+    // if(currentItem.type === 'Alcohol' || currentItem.type === 'Cigarrettes') {
+  
+    // }
+  }, [currentItem]);
   return (
     <Box>
       <Stack style={{ alignItems: "center" }}>
@@ -64,106 +78,107 @@ const Checkout = () => {
           {" "}
           Welcome to Store Name{" "}
         </Typography>
-        <Typography style={{ fontSize: "40px", textAlign: "center" }}>
-          {" "}
-          {!isLoyal ? <>Enter Loyalty ID</> : <>Begin Shopping</>}
-        </Typography>
-        {loyal ? (
-          <></>
+        {!isLoyal ? (
+          <Button
+            style={{ fontSize: "40px", textAlign: "center" }}
+            onClick={() => setLoyal(true)}
+          >
+            {" "}
+            Enter Loyalty ID
+          </Button>
         ) : (
-          <Stack direction="row" spacing={2}>
-            <TextField
-              style={{ alignContent: "center", width: "200px" }}
-              id="outlined-basic"
-              label="Enter ID"
-              variant="outlined"
-            />
+          <Typography style={{ fontSize: "40px", textAlign: "center" }}>
+            Continue Shopping
+          </Typography>
+        )}
+        <Dialog open={loyal}>
+          <TextField value={loyaltyId} />
+          <Keyboard
+          onChange={(input)=> setLoyaltyId(input)}           
+          layout={{
+            default: ["1 2 3", "4 5 6", "7 8 9", "{//} 0 {//}", "{bksp}"],
+            shift: ["! / #", "$ % ^", "& * (", "{shift} ) +", "{bksp}"]
+          }} />
+          <ButtonGroup>
             <Button
+              style={{ width: "97px" }}
               onClick={() => {
-                setLoyal(true);
+                setLoyal(false);
                 setisLoyal(true);
-                console.log(loyal);
               }}
             >
-              Enter
+              Submit
             </Button>
-          </Stack>
-        )}
-        {loyal ? (
-          <></>
-        ) : (
-          <Button
-            style={{ fontSize: "50px" }}
-            onClick={() => {
-              setLoyal(true);
-              setisLoyal(false);
-            }}
-          >
-            Skip
-          </Button>
-        )}
+            <Button style={{ width: "97px" }} onClick={() => {setLoyal(false); setLoyaltyId('')}}>
+              Exit
+            </Button>
+          </ButtonGroup>
+        </Dialog>
       </Stack>
       <Stack direction="row">
-        {loyal ? (
-          <Box style={{ marginLeft: "500x" }}>
-            <ButtonGroup
-              style={{ minWidth: "200px" }}
-              variant="contained"
-              orientation="vertical"
-              aria-label="outlined primary button group"
+        <Box style={{ marginLeft: "500x" }}>
+          <ButtonGroup
+            style={{ minWidth: "200px" }}
+            variant="contained"
+            orientation="vertical"
+            aria-label="outlined primary button group"
+          >
+            <Button
+              style={{ fontSize: "40px" }}
+              onClick={() => {
+                additems((arr) => [...arr, Newport]);
+                setCurrentItem(Newport);
+              }}
             >
-              <Button
-                style={{ fontSize: "40px" }}
-                onClick={() => {
-                  additems((arr) => [...arr, alcohol]);
-                  setCurrentItem(alcohol);
-                }}
-              >
-                Newport 100s <SmokingRoomsIcon></SmokingRoomsIcon>
-              </Button>
-              <Button
-                style={{ fontSize: "40px" }}
-                onClick={() => {
-                  additems((arr) => [...arr, alcohol]);
-                  setCurrentItem(alcohol);
-                }}
-              >
-                Deli <RestaurantIcon></RestaurantIcon>
-              </Button>
-              <Button
-                style={{ fontSize: "40px" }}
-                onClick={() => {
-                  additems((arr) => [...arr, alcohol]);
-                  setCurrentItem(alcohol);
-                }}
-              >
-                Powerade <LocalDrinkIcon></LocalDrinkIcon>
-              </Button>
-              <Button
-                style={{ fontSize: "40px" }}
-                onClick={() => {
-                  additems((arr) => [...arr, alcohol]);
-                  setCurrentItem(alcohol);
-                }}
-              >
-                Patron<LiquorIcon></LiquorIcon>
-              </Button>
-              <Button
-                style={{ fontSize: "40px" }}
-                onClick={() => {
-                  additems((arr) => [...arr, alcohol]);
-                  setCurrentItem(alcohol);
-                }}
-              >
-                Hennessy<LiquorIcon></LiquorIcon>
-              </Button>
-            </ButtonGroup>
-          </Box>
-        ) : (
-          <></>
-        )}{" "}
-        {/* <Current item={currentItem}></Current> */}
-        <Stack direction="column" style={{}}>
+              Newport 100s <SmokingRoomsIcon></SmokingRoomsIcon>
+            </Button>
+            <Button
+              style={{ fontSize: "40px" }}
+              onClick={() => {
+                additems((arr) => [...arr, Deli]);
+                setCurrentItem(Deli);
+              }}
+            >
+              Deli <RestaurantIcon></RestaurantIcon>
+            </Button>
+            <Button
+              style={{ fontSize: "40px" }}
+              onClick={() => {
+                additems((arr) => [...arr, Powerade]);
+                setCurrentItem(Powerade);
+              }}
+            >
+              Powerade <LocalDrinkIcon></LocalDrinkIcon>
+            </Button>
+            <Button
+              style={{ fontSize: "40px" }}
+              onClick={() => {
+                additems((arr) => [...arr, Patron]);
+                setCurrentItem(Patron);
+              }}
+            >
+              Patron<LiquorIcon></LiquorIcon>
+            </Button>
+            <Button
+              style={{ fontSize: "40px" }}
+              onClick={() => {
+                additems((arr) => [...arr, Henny]);
+                setCurrentItem(Henny);
+              }}
+            >
+              Hennessy<LiquorIcon></LiquorIcon>
+            </Button>
+          </ButtonGroup>
+        </Box>
+        <Stack
+          direction="column"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            marginLeft: "auto",
+            marginRight: 0,
+          }}
+        >
           <Webcam />
           <Typography style={{ fontSize: "20px", color: "#1b76d4" }}>
             Number of Items in <ShoppingCartIcon />: {items.length - 1}
