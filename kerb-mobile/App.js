@@ -3,25 +3,32 @@ import React, {useState} from 'react';
 import Realm from 'realm'
 import { Button, StyleSheet, Text, View } from 'react-native';
 import { getRealmApp } from './realmApp';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import Navigation from './navigation';
 export default function App() {
   const [user, setUser] = useState(null)
 
   if (user != null) {
     return (
-      <SafeAreaProvider>
-        <Navigation />
-        <StatusBar />
-      </SafeAreaProvider>
+      <View style={styles.container}>
+      <Text style={styles.text}>{user.id}</Text>
+      
+      <Button color="black" title="log in" onPress={() => {
+        logOut(user).then(resp => {
+          setUser(null)
+        }).catch((e) => {
+          console.error(e)
+        })
+      }}>
+      </Button>
+      <StatusBar style="auto" />
+      </View>
     )
   } else {
     return (
       <View style={styles.container}>
     <Text style={styles.title}>kerberos</Text>
     
-    <Button color="black" title="log in" onPress={() => {
+    <Button color="black" title="log out" onPress={() => {
       logIn(user).then(resp => {
         setUser(resp)
         console.log(resp.id)
