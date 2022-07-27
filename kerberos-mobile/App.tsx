@@ -75,8 +75,8 @@ export default function App() {
       else {
         await SecureStore.setItemAsync("username", username);
         await SecureStore.setItemAsync("password", password);
-        console.log("Mongo data");
-        console.log(response.data.document);
+        console.log("Mongo data received");
+        // console.log(response.data.document);
         setData(response.data.document);
         setIsSignedIn(true);
       }
