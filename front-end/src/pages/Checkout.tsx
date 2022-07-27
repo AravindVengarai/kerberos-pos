@@ -8,6 +8,8 @@ import {
   ButtonGroup,
   TextField,
   Dialog,
+  Paper,
+  Grid,
 } from "@mui/material";
 import * as faceapi from "face-api.js";
 import "react-simple-keyboard/build/css/index.css";
@@ -17,13 +19,10 @@ import "react-simple-keyboard/build/css/index.css";
 import Keyboard from "react-simple-keyboard";
 import LiquorIcon from "@mui/icons-material/Liquor";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-// import Webcam from "react-webcam";
 import Order from "../Components/Order";
 import LocalDrinkIcon from "@mui/icons-material/LocalDrink";
 import SmokingRoomsIcon from "@mui/icons-material/SmokingRooms";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
-import { getThemeProps } from "@mui/system";
-import Webcam from "react-webcam";
 
 export interface itemObject {
   barcode?: number;
@@ -41,9 +40,11 @@ const Newport = {
 };
 const Powerade = { barcode: 14, type: "Drink", label: "Powerade", price: 1.99 };
 const Deli = { barcode: 15, type: "food", label: "Deli", price: 5.99 };
+const itemArray = [Patron, Henny, Newport, Powerade, Deli];
 
 let video: any;
 let imageUpload: any;
+let labels: string[];
 
 const Checkout = () => {
   const numberFormat = (value: number) =>
@@ -92,7 +93,11 @@ const Checkout = () => {
     canvas.toBlob(function (blob: any) {
       imageUpload = new File([blob], "test.jpg", { type: "image/jpeg" });
     }, "image/jpeg");
-    startML();
+    Promise.all([
+      faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
+      faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
+      faceapi.nets.ssdMobilenetv1.loadFromUri("/models"), //heavier/accurate version of tiny face detector
+    ]).then(startML);
   };
 
   useEffect(() => {
@@ -140,11 +145,6 @@ const Checkout = () => {
         setRestricted(true);
         reset();
         start();
-        Promise.all([
-          faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
-          faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
-          faceapi.nets.ssdMobilenetv1.loadFromUri("/models"), //heavier/accurate version of tiny face detector
-        ]);
         checkID();
         // if (time === 0) {
         //   additems((arr) => [...arr, currentItem]);
@@ -214,60 +214,28 @@ const Checkout = () => {
         </Stack>
       </Stack>
       <Stack direction="row">
-        <Box style={{ marginLeft: "500x" }}>
-          <ButtonGroup
-            style={{ minWidth: "200px" }}
-            variant="contained"
-            orientation="vertical"
-            aria-label="outlined primary button group"
-          >
-            <Button
-              style={{ fontSize: "40px" }}
-              onClick={() => {
-                setDummy(!dummy);
-                setCurrentItem(Newport);
-              }}
-            >
-              Newport<SmokingRoomsIcon></SmokingRoomsIcon>
-            </Button>
-            <Button
-              style={{ fontSize: "40px" }}
-              onClick={() => {
-                setDummy(!dummy);
-                setCurrentItem(Deli);
-              }}
-            >
-              Deli <RestaurantIcon></RestaurantIcon>
-            </Button>
-            <Button
-              style={{ fontSize: "40px" }}
-              onClick={() => {
-                setDummy(!dummy);
-                setCurrentItem(Powerade);
-              }}
-            >
-              Powerade <LocalDrinkIcon></LocalDrinkIcon>
-            </Button>
-            <Button
-              style={{ fontSize: "40px" }}
-              onClick={() => {
-                setDummy(!dummy);
-                setCurrentItem(Patron);
-              }}
-            >
-              Patron<LiquorIcon></LiquorIcon>
-            </Button>
-            <Button
-              style={{ fontSize: "40px" }}
-              onClick={() => {
-                setDummy(!dummy);
-                setCurrentItem(Henny);
-              }}
-            >
-              Hennessy<LiquorIcon></LiquorIcon>
-            </Button>
-          </ButtonGroup>
-        </Box>
+        <Grid
+          container
+          spacing={2}
+          sx={{ ml: "30px", justifyContent: "space-between", mt: '15px'}}
+        >
+          {itemArray.map((item) => {
+            return (
+              <Paper variant="elevation" elevation={2} sx={gridPaperStyling}>
+                <Button
+                sx={{ fontSize: "40px", height:'720px' }}
+                onClick={() => {
+                  setDummy(!dummy);
+                  setCurrentItem(item);
+                }}
+              >
+                {item.label}
+                <SmokingRoomsIcon></SmokingRoomsIcon>
+              </Button>
+            </Paper>
+            )
+          })}
+        </Grid>
         <Stack
           direction="column"
           style={{
@@ -287,23 +255,25 @@ const Checkout = () => {
             loop
             ref={ref}
           ></video>
-          <Typography style={{ fontSize: "20px", color: "#1b76d4" }}>
-            Number of Items in <ShoppingCartIcon />: {items.length - 1}
-          </Typography>
-          <Order items={items}></Order>
-          <Button
-            style={{
-              backgroundColor: "green",
-              color: "white",
-              fontSize: "25px",
-              width: "fit-content",
-            }}
-            onClick={() => setToggle((prev) => !prev)}
-          >
-            Pay Now {numberFormat(total)}
-          </Button>
         </Stack>
       </Stack>
+      <Box>
+        <Typography style={{ fontSize: "20px", color: "#1b76d4" }}>
+              Number of Items in <ShoppingCartIcon />: {items.length - 1}
+            </Typography>
+            <Order items={items}></Order>
+            <Button
+              style={{
+                backgroundColor: "green",
+                color: "white",
+                fontSize: "25px",
+                width: "fit-content",
+              }}
+              onClick={() => setToggle((prev) => !prev)}
+            >
+              Pay Now {numberFormat(total)}
+            </Button>
+      </Box>
     </Box>
   );
 };
@@ -346,12 +316,12 @@ async function startML() {
     drawBox.draw(canvas);
   });
 
-  console.log('results');
+  console.log("results");
   console.log(results);
 }
 
 const loadLabeledImages = () => {
-  const labels = [
+  labels = [
     "Karan",
     "Thanasis",
     "Ankit",
@@ -380,4 +350,12 @@ const loadLabeledImages = () => {
       return new faceapi.LabeledFaceDescriptors(label, descriptions);
     })
   );
+};
+
+const gridPaperStyling = {
+  flexDirection: "column",
+  display: "flex",
+  height: "200px",
+  borderRadius: "8px",
+  width: "300px",
 };
