@@ -1,73 +1,103 @@
-const IDAnalyzer = require("idanalyzer");  
-  
-let CoreAPI = new IDAnalyzer.CoreAPI("Your API Key","US");  
-
-// Enable authentication module v2 to check if ID is authentic
-CoreAPI.enableAuthentication(true, 2);  
-
-// Analyze ID image by passing URL of the ID image (you may also use a local file)  
-CoreAPI.scan({ document_primary: "https://www.idanalyzer.com/img/sampleid1.jpg", biometric_photo: "https://upload.wikimedia.org/wikipedia/en/7/7d/Lenna_%28test_image%29.png" }).then(function (response) {  
-    if(!response.error){  
-        console.log(response);  
-        // All the information about this ID will be returned in an associative array  
-        let data_result = response['result'];  
-        let authentication_result = response['authentication'];  
-        let face_result = response['face'];  
-  
-        // Print result  
-        console.log(`Hello your name is ${data_result['firstName']} ${data_result['lastName']}`);  
-  
-        // Parse document authentication results  
-        if(authentication_result){  
-            if(authentication_result['score'] > 0.5) {  
-                console.log("The document uploaded is authentic");  
-            }else if(authentication_result['score'] > 0.3){  
-                console.log("The document uploaded looks little bit suspicious");  
-            }else{  
-                console.log("The document uploaded is fake");  
-            }  
-        }  
-        // Parse biometric verification results  
-        if(face_result){  
-            if(face_result['isIdentical']) {  
-                console.log("Biometric verification PASSED!");  
-            }else{  
-                console.log("Biometric verification FAILED!");  
-            }  
-            console.log("Confidence Score: "+face_result['confidence']);  
-        }  
-    }else{  
-        // API returned an error  
-        console.log(response.error);  
-    }  
-}).catch(function (err) {  
-    console.log(err.message);  
+import React, { useEffect, useState } from "react";
+import { StyleSheet, Image, Alert } from "react-native";
+import { Button } from "../components";
+import { View, Text, ActivityIndicator } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import Scan from "../integrations/IDAuth";
+export default function IdAnalyser({ navigation, route }: any) {
+  const { imageURI } = route.params;
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<any>([]);
+  const navigate = useNavigation<any>();
+  useEffect(() => {
+    Scan(imageURI)
+      .then((res) => {
+        console.log("Got it");
+        console.log(res);
+        const authentication_result = res["authentication"];
+        if (authentication_result) {
+          if (authentication_result["score"] > 0.7) {
+            setData(res);
+            setLoading(false);
+          } else {
+            Alert.alert(
+              "Suspicious ID",
+              "Your ID looks suspicious. Please try taking another photo",
+              [{ text: "Try Again", onPress: () => navigate.goBack() }]
+            );
+          }
+        }
+      })
+      .catch((e: any) => {
+        console.log("Did not get it");
+        console.log(e);
+        Alert.alert("Unexpected Error", "Hi", [
+          { text: "Try Again", onPress: () => navigate.goBack() },
+        ]);
+      });
+  }, []);
+  return (
+    <View style={styles.container}>
+      <View style={styles.topContainer}>
+        <Text style={styles.title}>Verifying your ID</Text>
+        <Text style={styles.body}> Hold On </Text>
+      </View>
+      <View style={styles.bottopContainer}>
+        {loading ? (
+          <>
+            <ActivityIndicator
+              style={{ marginTop: 50 }}
+              size={"large"}
+            ></ActivityIndicator>
+            <Text style={{ marginTop: 20, fontSize: 15 }}>Loading</Text>
+          </>
+        ) : (
+          <>
+            <Text>Authenticity: {data.authentication.score}</Text>
+            <Text>Issue Date: {data.result?.issued}</Text>
+          </>
+        )}
+      </View>
+    </View>
+  );
+}
+const styles = StyleSheet.create({
+  container: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    flex: 1,
+    padding: 10,
+  },
+  topContainer: { flex: 1, alignItems: "center" },
+  bottopContainer: { flex: 4, width: "100%", alignItems: "center" },
+  title: {
+    marginTop: 50,
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  body: {
+    marginTop: 20,
+    fontSize: 15,
+  },
+  separator: {
+    marginVertical: 30,
+    height: 1,
+    width: "80%",
+  },
+  buttonGroup: {
+    display: "flex",
+    flexDirection: "row",
+    marginTop: "auto",
+    marginBottom: 50,
+    width: 300,
+    justifyContent: "space-between",
+  },
+  leftButton: {
+    width: 130,
+    backgroundColor: "#257a87",
+  },
+  rightButton: {
+    width: 130,
+  },
 });
-
-/* 
-CoreAPI.enableVault(true,false,false,false);  // enable vault cloud storage to store document information and image  
-CoreAPI.setBiometricThreshold(0.6); // make face verification more strict 
-CoreAPI.enableAuthentication(true, 'quick'); // check if document is real using 'quick' module 
-CoreAPI.enableBarcodeMode(false); // disable OCR and scan for AAMVA barcodes only 
-CoreAPI.enableImageOutput(true,true,"url"); // output cropped document and face region in URL format 
-CoreAPI.enableDualsideCheck(true); // check if data on front and back of ID matches 
-CoreAPI.setVaultData("user@example.com",12345,"AABBCC"); // store custom data into vault 
-CoreAPI.restrictCountry("US,CA,AU"); // accept documents from United States, Canada and Australia 
-CoreAPI.restrictState("CA,TX,WA"); // accept documents from california, texas and washington 
-CoreAPI.restrictType("DI"); // accept only driver license and identification card 
-CoreAPI.setOCRImageResize(0); // disable OCR resizing 
-CoreAPI.verifyExpiry(true); // check document expiry 
-CoreAPI.verifyAge("18-120"); // check if person is above 18 
-CoreAPI.verifyDOB("1990/01/01"); // check if person's birthday is 1990/01/01 
-CoreAPI.verifyDocumentNumber("X1234567"); // check if the person's ID number is X1234567 
-CoreAPI.verifyName("Elon Musk"); // check if the person is named Elon Musk 
-CoreAPI.verifyAddress("123 Sunny Rd, California"); // Check if address on ID matches with provided address 
-CoreAPI.verifyPostcode("90001"); // check if postcode on ID matches with provided postcode  
-CoreAPI.enableAMLCheck(true); // enable AML/PEP compliance check
-CoreAPI.setAMLDatabase("global_politicians,eu_meps,eu_cors"); // limit AML check to only PEPs
-CoreAPI.enableAMLStrictMatch(true); // make AML matching more strict to prevent false positives
-CoreAPI.generateContract("Template ID", "PDF", {"email":"user@example.com"}); // generate a PDF document autofilled with data from user ID
-
-*/
-
-// CoreAPI.scan({ document_primary: "path/to/front.jpg" , document_secondary: "path/to/back.jpg"})

@@ -55,7 +55,7 @@ export default function PhotoID({ navigation, route }: any) {
         {image && (
           <Image
             source={{ uri: image }}
-            style={{ width: "95%", height: "60%" }}
+            style={{ width: "95%", height: "60%", borderRadius: 7 }}
           />
         )}
         {image ? (
@@ -63,7 +63,12 @@ export default function PhotoID({ navigation, route }: any) {
             <Button style={styles.leftButton} onPress={pickImage}>
               Retake Photo
             </Button>
-            <Button style={styles.rightButton} onPress={pickImage}>
+            <Button
+              style={styles.rightButton}
+              onPress={async () =>
+                navigate.navigate("IdAnalyser", { imageURI: image })
+              }
+            >
               Continue
             </Button>
           </View>

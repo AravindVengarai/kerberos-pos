@@ -13,6 +13,7 @@ import {
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as React from "react";
 import { ColorSchemeName, Pressable, Text } from "react-native";
+import IdAnalyser from "../screens/IdAnalyserScreen";
 
 import Colors from "../constants/Colors";
 import useColorScheme from "../hooks/useColorScheme";
@@ -52,6 +53,11 @@ function RootNavigator() {
         name="NotFound"
         component={NotFoundScreen}
         options={{ title: "Oops!" }}
+      />
+      <Stack.Screen
+        name="IdAnalyser"
+        component={IdAnalyser}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="PhotoID"
