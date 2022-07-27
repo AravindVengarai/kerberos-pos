@@ -4,15 +4,13 @@ const api = axios.create({
   baseURL: baseUrl,
 });
 import * as FileSystem from "expo-file-system";
-const apiKey = "ETQ4WUCLvndMxgstBXw5VTcxRPUCE9pk";
+const apiKey = "pZeogloH10BZ744ttg2xxi04nAtbGemh";
 
 export default async function ScanId(imageURI: string) {
-  console.log(imageURI);
   const filebase64 = await FileSystem.readAsStringAsync(imageURI, {
     encoding: "base64",
   });
   console.log("Encrypted");
-  // console.log(base64);
   const res = await api.post("/", {
     apikey: apiKey,
     file_base64: filebase64,

@@ -4,7 +4,7 @@ const api = axios.create({
   baseURL: baseUrl,
 });
 import * as FileSystem from "expo-file-system";
-const apiKey = "ETQ4WUCLvndMxgstBXw5VTcxRPUCE9pk";
+const apiKey = "pZeogloH10BZ744ttg2xxi04nAtbGemh";
 
   export default async function ScanFace(face_URI: string, ID_URI: string) {
     console.log(face_URI);
@@ -26,6 +26,6 @@ const apiKey = "ETQ4WUCLvndMxgstBXw5VTcxRPUCE9pk";
     biometric_threshold: 0.70,
   });
   console.log("DATA HERE");
-  console.log(res.data);
+  // console.log(res.data);
   return res.data;
 }

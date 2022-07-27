@@ -18,6 +18,7 @@ export default function App() {
   const [password, setPassword] = useState("");
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [error, setError] = useState("");
+  const [data, setData] = useState<any>({});
   async function handleSignUp() {
     try {
       //Check for duplicate username
@@ -61,16 +62,17 @@ export default function App() {
           password: pass_tmp || password,
         },
       });
-      console.log("Got resopnse");
-      console.log(response);
-      console.log(
-        "--------------------------------------------------------------------"
-      );
-      console.log(response.data.document);
+      // console.log("Got resopnse");
+      // console.log(response);
+      // console.log(
+      //   "--------------------------------------------------------------------"
+      // );
+      // console.log(response.data.document);
       if (response.data.document === null) throw "Could not Sign In";
       else {
         await SecureStore.setItemAsync("username", username);
         await SecureStore.setItemAsync("password", password);
+        setData(response.data.document);
         setIsSignedIn(true);
       }
     } catch (e: any) {
@@ -135,7 +137,7 @@ export default function App() {
     );
   }
   return (
-    <UserAuth.Provider value={{ isSignedIn, setIsSignedIn }}>
+    <UserAuth.Provider value={{ isSignedIn, setIsSignedIn, data, setData }}>
       <SafeAreaProvider>
         <Navigation colorScheme={colorScheme} />
         <StatusBar />
