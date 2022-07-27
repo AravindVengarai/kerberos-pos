@@ -1,12 +1,14 @@
 import { StyleSheet, Image, Text } from "react-native";
 import { Button } from "../components";
-
 import EditScreenInfo from "../components/EditScreenInfo";
 import { Text as ThemedText, View } from "../components/Themed";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigation } from "@react-navigation/native";
+import { UserAuth } from "../navigation/UserAuth";
+import * as SecureStore from "expo-secure-store";
 
 export default function Authentication({ navigation }: any) {
+  const { isSignedIn, setIsSignedIn } = useContext(UserAuth);
   const navigate = useNavigation<any>();
   //Need to implement logic here
   const UserHasAuthenticated = false;
@@ -35,6 +37,15 @@ export default function Authentication({ navigation }: any) {
       />
       <Button onPress={() => navigate.navigate("IDPhoto")}>
         <Text style={styles.body}>Start Verification Process</Text>
+      </Button>
+      <Button
+        onPress={async () => {
+          await SecureStore.deleteItemAsync("username");
+          await SecureStore.deleteItemAsync("password");
+          setIsSignedIn(false);
+        }}
+      >
+        <Text style={styles.body}>Logout</Text>
       </Button>
     </View>
   );

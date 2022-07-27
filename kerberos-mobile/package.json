@@ -41,7 +41,8 @@
     "react-native-screens": "~3.11.1",
     "react-native-web": "0.17.7",
     "rn-nodeify": "^10.3.0",
-    "realm": "^10.19.5"
+    "realm": "^10.19.5",
+    "expo-secure-store": "~11.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
