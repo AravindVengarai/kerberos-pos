@@ -25,7 +25,8 @@ import Order from "../Components/Order";
 import LocalDrinkIcon from "@mui/icons-material/LocalDrink";
 import SmokingRoomsIcon from "@mui/icons-material/SmokingRooms";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
-import { getUserInfo } from '../integrations/auth';
+import { getUserInfo } from "../integrations/auth";
+import { RestartAltTwoTone } from "@mui/icons-material";
 
 export interface itemObject {
   barcode?: number;
@@ -35,15 +36,45 @@ export interface itemObject {
 }
 const Patron = { barcode: 11, type: "Alcohol", label: "Patron", price: 29.99 };
 const Henny = { barcode: 12, type: "Alcohol", label: "Hennessy", price: 26.99 };
+const Chicken = {
+  barcode: 11,
+  type: "Grocery",
+  label: "Chicken",
+  price: 10.99,
+};
+const Napkins = { barcode: 12, type: "Grocery", label: "Napkins", price: 4.99 };
+const Cherries = {
+  barcode: 11,
+  type: "Grocery",
+  label: "Cherries",
+  price: 3.99,
+};
+
 const Newport = {
   barcode: 13,
   type: "Cigarrettes",
   label: "Newports",
   price: 8.99,
 };
+const Spinach = {
+  barcode: 18,
+  type: "Grocery",
+  label: "Spinach",
+  price: 5.99,
+};
 const Powerade = { barcode: 14, type: "Drink", label: "Powerade", price: 1.99 };
 const Deli = { barcode: 15, type: "food", label: "Deli", price: 5.99 };
-const itemArray = [Patron, Henny, Newport, Powerade, Deli];
+const itemArray = [
+  Patron,
+  Henny,
+  Newport,
+  Powerade,
+  Deli,
+  Spinach,
+  Chicken,
+  Napkins,
+  Cherries,
+];
 
 let video: any;
 let imageUpload: any;
@@ -59,6 +90,7 @@ const Checkout = () => {
       style: "currency",
       currency: "USD",
     }).format(value);
+  const [payNowCheck, setPayNowCheck] = useState(false);
   const [needToCheck, setNeedToCheck] = useState(false);
   const [loyal, setLoyal] = useState(false);
   const [total, setTotal] = useState(0);
@@ -109,14 +141,6 @@ const Checkout = () => {
   };
 
   useEffect(() => {
-    if (toggle) {
-      getPicture();
-      console.log("made it");
-      setToggle(false);
-    }
-  }, [toggle]);
-
-  useEffect(() => {
     video = ref.current;
     navigator.mediaDevices
       .getUserMedia({ video: true })
@@ -145,6 +169,19 @@ const Checkout = () => {
     }
   };
   useEffect(() => {
+    if (toggle) {
+      setRestricted(true);
+      reset();
+      start();
+      setNeedToCheck(false);
+      console.log("made it");
+      res = undefined;
+      setPayNowCheck(true);
+      checkID();
+      setToggle(!toggle);
+    }
+  }, [toggle]);
+  useEffect(() => {
     if (currentItem.label !== "none") {
       if (
         !needToCheck &&
@@ -167,42 +204,48 @@ const Checkout = () => {
 
   const settingPictures = async (result: any) => {
     userName = result.name;
-    console.log('in setting picture');
+    console.log("in setting picture");
     result.images.forEach((pic: any) => base64.push(pic));
-    console.log('trial');
+    console.log("trial");
     base64.forEach(async (el: any) => {
-      const blob = b64toBlob(el, 'image/jpeg');
-      console.log('blob');
+      const blob = b64toBlob(el, "image/jpeg");
+      console.log("blob");
       console.log(blob);
       const file = new File([blob], "test.jpg", { type: "image/jpeg" });
-      console.log('file');
+      console.log("file");
       console.log(file);
       const image = await faceapi.bufferToImage(file);
-      console.log('image');
+      console.log("image");
       console.log(image);
       imageArray.push(image);
-    })
-}
+    });
+  };
 
-const b64toBlob = (b64Data:any, contentType='image/jpeg', sliceSize=512) => {
-  const byteCharacters = atob(b64Data);
-  const byteArrays = [];
+  const b64toBlob = (
+    b64Data: any,
+    contentType = "image/jpeg",
+    sliceSize = 512
+  ) => {
+    const byteCharacters = atob(b64Data);
+    const byteArrays = [];
 
-  for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-    const slice = byteCharacters.slice(offset, offset + sliceSize);
-    const byteNumbers = new Array(slice.length);
-    for (let i = 0; i < slice.length; i++) {
-      byteNumbers[i] = slice.charCodeAt(i);
+    for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+      const slice = byteCharacters.slice(offset, offset + sliceSize);
+      const byteNumbers = new Array(slice.length);
+      for (let i = 0; i < slice.length; i++) {
+        byteNumbers[i] = slice.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      byteArrays.push(byteArray);
     }
-    const byteArray = new Uint8Array(byteNumbers);
-    byteArrays.push(byteArray);
-  }
-  const blob = new Blob(byteArrays, {type: contentType});
-  return blob;
-}
-
+    const blob = new Blob(byteArrays, { type: contentType });
+    return blob;
+  };
 
   useEffect(() => {
+    // let check = false;
+    // res.map((item:any) => (check ||= item.label === userName));
+
     if (res !== undefined && res === userName) {
       additems((arr) => [...arr, currentItem]);
       setNeedToCheck(true);
@@ -216,15 +259,18 @@ const b64toBlob = (b64Data:any, contentType='image/jpeg', sliceSize=512) => {
   }, [res]);
 
   return (
-    <Box sx={{ backgroundColor: "#DAEAF9", height: "100vh" }}>
+    <Box sx={{ backgroundColor: "#FFFFED", height: "100vh" }}>
       {restricted && checkID()}
       <Dialog open={openDialog}>
-      {needToCheck?
-        <Button onClick={() => setOpenDialog(false)}>
-          Age has been Verified <CheckCircleSharpIcon /> Tap to Continue
-        </Button>:<Button onClick={() => setOpenDialog(false)}>
-          Age not Verified! Tap to Continue
-        </Button> }
+        {needToCheck ? (
+          <Button onClick={() => setOpenDialog(false)}>
+            Age has been Verified <CheckCircleSharpIcon /> Tap to Continue
+          </Button>
+        ) : (
+          <Button onClick={() => setOpenDialog(false)}>
+            Age not Verified! Tap to Continue
+          </Button>
+        )}
       </Dialog>
       <Stack
         direction="row"
@@ -287,23 +333,22 @@ const b64toBlob = (b64Data:any, contentType='image/jpeg', sliceSize=512) => {
         <Grid
           container
           spacing={2}
-          sx={{ ml: "30px", justifyContent: "space-between", mt: '15px'}}
+          sx={{ ml: "30px", justifyContent: "space-between", mt: "15px" }}
         >
           {itemArray.map((item) => {
             return (
-              <Paper variant="elevation" elevation={2} sx={gridPaperStyling}>
+              <Paper variant="elevation" elevation={5} sx={gridPaperStyling}>
                 <Button
-                sx={{ fontSize: "40px", height:'720px' }}
-                onClick={() => {
-                  setDummy(!dummy);
-                  setCurrentItem(item);
-                }}
-              >
-                {item.label}
-                <SmokingRoomsIcon></SmokingRoomsIcon>
-              </Button>
-            </Paper>
-            )
+                  sx={{ fontSize: "40px", height: "720px", color: "white" }}
+                  onClick={() => {
+                    setDummy(!dummy);
+                    setCurrentItem(item);
+                  }}
+                >
+                  {item.label}
+                </Button>
+              </Paper>
+            );
           })}
         </Grid>
         <Stack
@@ -315,34 +360,67 @@ const b64toBlob = (b64Data:any, contentType='image/jpeg', sliceSize=512) => {
             marginRight: 0,
           }}
         >
-          <video
-            id="videoInput"
-            width="720"
-            height="550"
-            muted
-            controls
-            autoPlay
-            loop
-            ref={ref}
-          ></video>
+          <Paper
+            variant="elevation"
+            elevation={10}
+            style={{ borderRadius: "50px" }}
+          >
+            <video
+              id="videoInput"
+              width="720"
+              height="550"
+              muted
+              controls
+              autoPlay
+              loop
+              ref={ref}
+              style={{ borderRadius: "50px" }}
+            ></video>
+          </Paper>
         </Stack>
       </Stack>
-      <Box>
-        <Typography style={{ fontSize: "20px", color: "#1b76d4" }}>
-              Number of Items in <ShoppingCartIcon />: {items.length - 1}
-            </Typography>
-            <Order items={items}></Order>
+
+      <Box
+        style={{
+          justifyContent: "flex-end",
+          display: "flex",
+          flexDirection: "row",
+        }}
+      >
+        <Paper variant="elevation" elevation={5} style={{ width: "720px" }}>
+          <Stack direction="column">
+            <Box>
+              <Typography style={{ fontSize: "20px", color: "#1b76d4" }}>
+                Number of Items in <ShoppingCartIcon />: {items.length - 1}
+              </Typography>
+              <Order items={items}></Order>
+            </Box>
+            {/* <Grid
+            style={{
+              justifyContent: "flex-end",
+              display: "flex",
+              flexDirection: "row",
+            }}
+          > */}
             <Button
               style={{
-                backgroundColor: "green",
+                backgroundColor: "#90ee90",
                 color: "white",
                 fontSize: "25px",
                 width: "fit-content",
+                marginRight: "0",
+                marginLeft: "auto",
               }}
-              onClick={() => setToggle((prev) => !prev)}
+              onClick={() => {
+                setToggle((prev) => !prev);
+                // setPayNowCheck(true);
+              }}
             >
               Pay Now {numberFormat(total)}
             </Button>
+            {/* </Grid> */}
+          </Stack>
+        </Paper>
       </Box>
     </Box>
   );
@@ -392,7 +470,7 @@ async function startML() {
 }
 
 const loadLabeledImages = () => {
-  console.log('image array in loaded');
+  console.log("image array in loaded");
   console.log(imageArray);
   return Promise.all(
     imageArray.map(async (img: any) => {
@@ -400,10 +478,10 @@ const loadLabeledImages = () => {
       const realImg = new Image();
       realImg.src = img.currentSrc;
       const detections = await faceapi
-          .detectSingleFace(realImg)
-          .withFaceLandmarks()
-          .withFaceDescriptor();
-        if (detections?.descriptor) descriptions.push(detections.descriptor);
+        .detectSingleFace(realImg)
+        .withFaceLandmarks()
+        .withFaceDescriptor();
+      if (detections?.descriptor) descriptions.push(detections.descriptor);
       return new faceapi.LabeledFaceDescriptors(userName, descriptions);
     })
   );
@@ -412,7 +490,8 @@ const loadLabeledImages = () => {
 const gridPaperStyling = {
   flexDirection: "column",
   display: "flex",
-  height: "200px",
+  height: "150px",
   borderRadius: "8px",
   width: "300px",
+  backgroundColor: "#90ee90",
 };
