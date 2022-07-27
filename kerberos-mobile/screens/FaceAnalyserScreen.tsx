@@ -7,6 +7,9 @@ import ScanFace from "../integrations/FaceAuth";
 import api from "../integrations/api";
 import { UserAuth } from "../navigation/UserAuth";
 import * as FileSystem from "expo-file-system";
+function getRandomInt(max: number) {
+  return Math.floor(Math.random() * max);
+}
 export default function FaceAnalyser({ navigation, route }: any) {
   const { ID_URI, imageURI } = route.params;
   const { setData, data }: any = useContext(UserAuth);
@@ -53,6 +56,18 @@ export default function FaceAnalyser({ navigation, route }: any) {
         );
       });
   }, []);
+  const storeLoyalty = {
+    storeName: "publix",
+    loyaltyID: (() => {
+      let str = "";
+      for (let i = 0; i < 6; i++) {
+        str += getRandomInt(10);
+      }
+      console.log("random string");
+      console.log(str);
+      return str;
+    })(),
+  };
   return (
     <View style={styles.container}>
       <View style={styles.topContainer}>
@@ -88,6 +103,7 @@ export default function FaceAnalyser({ navigation, route }: any) {
                     update: {
                       $push: {
                         images: { $each: [photo_base64, ID_base64] },
+                        loyalties: { $each: [storeLoyalty] },
                       },
                       $set: {
                         name: verify.result?.firstName ?? "",
@@ -98,14 +114,16 @@ export default function FaceAnalyser({ navigation, route }: any) {
                     upsert: true,
                   });
                   setData(
-                    (await api.post("findOne", {
-                      dataSource: "Cluster0",
-                      database: "kerberos",
-                      collection: "users",
-                      filter: {
-                        _id: { $oid: data._id },
-                      },
-                    })).data.document
+                    (
+                      await api.post("findOne", {
+                        dataSource: "Cluster0",
+                        database: "kerberos",
+                        collection: "users",
+                        filter: {
+                          _id: { $oid: data._id },
+                        },
+                      })
+                    ).data.document
                   );
                   navigate.navigate("Auth");
                   console.log(response.data);

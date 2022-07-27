@@ -13,7 +13,7 @@ import {
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as React from "react";
 import { ColorSchemeName, Pressable, Text } from "react-native";
-import { Authentication, FaceAnalyser, FacePhoto, IDAnalyser, IDPhoto, Modal, TabTwoScreen } from "../screens";
+import { Authentication, FaceAnalyser, FacePhoto, IDAnalyser, IDPhoto, Loyalty, Modal, TabTwoScreen } from "../screens";
 
 import Colors from "../constants/Colors";
 import useColorScheme from "../hooks/useColorScheme";
@@ -117,8 +117,8 @@ function BottomTabNavigator() {
         })}
       />
       <BottomTab.Screen
-        name="TabTwo"
-        component={TabTwoScreen}
+        name="Loyalty"
+        component={Loyalty}
         options={{
           title: "Tab Two",
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,

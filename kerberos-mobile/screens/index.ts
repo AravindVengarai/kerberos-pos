@@ -4,6 +4,6 @@ import FacePhoto from "./FacePhotoScreen";
 import IDAnalyser from "./IDAnalyserScreen";
 import IDPhoto from "./IDPhotoScreen";
 import Modal from "./ModalScreen";
-import TabTwoScreen from "./TabTwoScreen";
+import Loyalty from "./LoyaltyScreen";
 
-export {Authentication, FaceAnalyser, FacePhoto, IDAnalyser, IDPhoto, Modal, TabTwoScreen}
+export {Authentication, FaceAnalyser, FacePhoto, IDAnalyser, IDPhoto, Modal, Loyalty}

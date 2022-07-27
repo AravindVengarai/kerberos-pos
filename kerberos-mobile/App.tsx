@@ -41,6 +41,9 @@ export default function App() {
         document: {
           username: username,
           password: password,
+          verified: false,
+          images: [],
+          loyalties: [],
         },
       });
       handleSignIn();
@@ -72,6 +75,8 @@ export default function App() {
       else {
         await SecureStore.setItemAsync("username", username);
         await SecureStore.setItemAsync("password", password);
+        console.log("Mongo data");
+        console.log(response.data.document);
         setData(response.data.document);
         setIsSignedIn(true);
       }
@@ -83,7 +88,11 @@ export default function App() {
     (async () => {
       let username_stored = await SecureStore.getItemAsync("username");
       let password_stored = await SecureStore.getItemAsync("password");
-      console.log(username_stored, password_stored);
+      console.log(
+        username_stored,
+        password_stored,
+        "username and password in device"
+      );
       if (!username_stored || !password_stored) {
         setIsSignedIn(false);
       } else {
@@ -108,6 +117,7 @@ export default function App() {
           }}
         ></TextInput>
         <TextInput
+          secureTextEntry
           style={styles.input}
           placeholder="Password"
           onChangeText={(e) => {
@@ -163,7 +173,7 @@ const styles = StyleSheet.create({
   },
   button: {
     width: 100,
-    height: 40,
+    height: 50,
   },
   input: {
     textAlign: "center",
