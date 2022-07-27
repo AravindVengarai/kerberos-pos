@@ -13,7 +13,9 @@ import {
   Icon,
   Dialog,
 } from "@mui/material";
-import 'react-simple-keyboard/build/css/index.css';
+import NCR_Logo from "../assets/NCR_Logo.svg";
+import { useTimer } from "use-timer";
+import "react-simple-keyboard/build/css/index.css";
 import Keyboard from "react-simple-keyboard";
 import LiquorIcon from "@mui/icons-material/Liquor";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
@@ -30,10 +32,14 @@ export interface itemObject {
 }
 const Patron = { barcode: 11, type: "Alcohol", label: "Patron", price: 29.99 };
 const Henny = { barcode: 12, type: "Alcohol", label: "Hennessy", price: 26.99 };
-const Newport = { barcode: 13, type: "Cigarrettes", label: "Newports", price: 8.99 };
-const Powerade =  { barcode: 14, type: "Drink", label: "Powerade", price: 1.99 };
-const Deli =  { barcode: 15, type: "food", label: "Deli", price: 5.99 };
-
+const Newport = {
+  barcode: 13,
+  type: "Cigarrettes",
+  label: "Newports",
+  price: 8.99,
+};
+const Powerade = { barcode: 14, type: "Drink", label: "Powerade", price: 1.99 };
+const Deli = { barcode: 15, type: "food", label: "Deli", price: 5.99 };
 
 const Checkout = () => {
   const numberFormat = (value: number) =>
@@ -42,17 +48,17 @@ const Checkout = () => {
       currency: "USD",
     }).format(value);
   const [needToCheck, setNeedToCheck] = useState(false);
-  const [beenChecked, setBeenChecked] = useState(false);
   const [loyal, setLoyal] = useState(false);
   const [total, setTotal] = useState(0);
   const [isLoyal, setisLoyal] = useState(false);
-  const [loyaltyId, setLoyaltyId] = useState('');
+  const [loyaltyId, setLoyaltyId] = useState("");
   const [currentItem, setCurrentItem] = useState({
     barcode: 1,
     type: "none",
     label: "none",
     price: 0,
   });
+  const [dummy, setDummy] = useState(false);
   const [items, additems] = useState([
     { barcode: 0, type: "type", label: "Item Label", price: 0 },
   ]);
@@ -66,54 +72,88 @@ const Checkout = () => {
     }
     setTotal(cnt);
   }, [items]);
+  const { time, start, pause, reset, status } = useTimer({
+    initialTime: 10,
+    timerType: "DECREMENTAL",
+  });
+  const checkID = () => {
+    if (currentItem.type === "Alcohol" || currentItem.type === "Cigarrettes") {
+      if (!needToCheck) {
+        console.log("inside alc");
+        return (
+          <Dialog open={time > 0}>Starting Age Verification Now: {time}</Dialog>
+        );
+      }
+    }
+  };
   useEffect(() => {
-    // if(currentItem.type === 'Alcohol' || currentItem.type === 'Cigarrettes') {
-  
-    // }
-  }, [currentItem]);
+    if (currentItem.label !== "none") {
+      reset();
+      start();
+      checkID();
+      if (time === 0) {
+        additems((arr) => [...arr, currentItem]);
+      }
+    }
+  }, [currentItem, dummy]);
+
   return (
     <Box>
-      <Stack style={{ alignItems: "center" }}>
-        <Typography style={{ fontSize: "40px", textAlign: "center" }}>
-          {" "}
-          Welcome to Store Name{" "}
-        </Typography>
-        {!isLoyal ? (
-          <Button
-            style={{ fontSize: "40px", textAlign: "center" }}
-            onClick={() => setLoyal(true)}
-          >
-            {" "}
-            Enter Loyalty ID
-          </Button>
-        ) : (
+      {checkID()}
+      <Stack
+        direction="row"
+        style={{ alignItems: "center", justifyContent: "center" }}
+      >
+        <img style={{ width: "100px", height: "auto" }} src={NCR_Logo}></img>
+        <Stack style={{ alignItems: "center" }}>
           <Typography style={{ fontSize: "40px", textAlign: "center" }}>
-            Continue Shopping
+            {" "}
+            Welcome to Store Name{" "}
           </Typography>
-        )}
-        <Dialog open={loyal}>
-          <TextField value={loyaltyId} />
-          <Keyboard
-          onChange={(input)=> setLoyaltyId(input)}           
-          layout={{
-            default: ["1 2 3", "4 5 6", "7 8 9", "{//} 0 {//}", "{bksp}"],
-            shift: ["! / #", "$ % ^", "& * (", "{shift} ) +", "{bksp}"]
-          }} />
-          <ButtonGroup>
+          {!isLoyal ? (
             <Button
-              style={{ width: "97px" }}
-              onClick={() => {
-                setLoyal(false);
-                setisLoyal(true);
-              }}
+              style={{ fontSize: "40px", textAlign: "center" }}
+              onClick={() => setLoyal(true)}
             >
-              Submit
+              {" "}
+              Enter Loyalty ID
             </Button>
-            <Button style={{ width: "97px" }} onClick={() => {setLoyal(false); setLoyaltyId('')}}>
-              Exit
-            </Button>
-          </ButtonGroup>
-        </Dialog>
+          ) : (
+            <Typography style={{ fontSize: "40px", textAlign: "center" }}>
+              Continue Shopping
+            </Typography>
+          )}
+          <Dialog open={loyal}>
+            <TextField value={loyaltyId} />
+            <Keyboard
+              onChange={(input) => setLoyaltyId(input)}
+              layout={{
+                default: ["1 2 3", "4 5 6", "7 8 9", "{//} 0 {//}", "{bksp}"],
+                shift: ["! / #", "$ % ^", "& * (", "{shift} ) +", "{bksp}"],
+              }}
+            />
+            <ButtonGroup>
+              <Button
+                style={{ width: "97px" }}
+                onClick={() => {
+                  setLoyal(false);
+                  setisLoyal(true);
+                }}
+              >
+                Submit
+              </Button>
+              <Button
+                style={{ width: "97px" }}
+                onClick={() => {
+                  setLoyal(false);
+                  setLoyaltyId("");
+                }}
+              >
+                Exit
+              </Button>
+            </ButtonGroup>
+          </Dialog>
+        </Stack>
       </Stack>
       <Stack direction="row">
         <Box style={{ marginLeft: "500x" }}>
@@ -126,16 +166,16 @@ const Checkout = () => {
             <Button
               style={{ fontSize: "40px" }}
               onClick={() => {
-                additems((arr) => [...arr, Newport]);
+                setDummy(!dummy);
                 setCurrentItem(Newport);
               }}
             >
-              Newport 100s <SmokingRoomsIcon></SmokingRoomsIcon>
+              Newport<SmokingRoomsIcon></SmokingRoomsIcon>
             </Button>
             <Button
               style={{ fontSize: "40px" }}
               onClick={() => {
-                additems((arr) => [...arr, Deli]);
+                setDummy(!dummy);
                 setCurrentItem(Deli);
               }}
             >
@@ -144,7 +184,7 @@ const Checkout = () => {
             <Button
               style={{ fontSize: "40px" }}
               onClick={() => {
-                additems((arr) => [...arr, Powerade]);
+                setDummy(!dummy);
                 setCurrentItem(Powerade);
               }}
             >
@@ -153,7 +193,7 @@ const Checkout = () => {
             <Button
               style={{ fontSize: "40px" }}
               onClick={() => {
-                additems((arr) => [...arr, Patron]);
+                setDummy(!dummy);
                 setCurrentItem(Patron);
               }}
             >
@@ -162,7 +202,7 @@ const Checkout = () => {
             <Button
               style={{ fontSize: "40px" }}
               onClick={() => {
-                additems((arr) => [...arr, Henny]);
+                setDummy(!dummy);
                 setCurrentItem(Henny);
               }}
             >
