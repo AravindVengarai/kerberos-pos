@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import * as faceapi from "face-api.js";
 import "react-simple-keyboard/build/css/index.css";
+import CheckCircleSharpIcon from "@mui/icons-material/CheckCircleSharp";
 import NCR_Logo from "../assets/NCR_Logo.svg";
 import { useTimer } from "use-timer";
 import "react-simple-keyboard/build/css/index.css";
@@ -32,6 +33,7 @@ export interface itemObject {
   label?: string;
   price?: number;
 }
+let buttonClose = false;
 const Patron = { barcode: 11, type: "Alcohol", label: "Patron", price: 29.99 };
 const Henny = { barcode: 12, type: "Alcohol", label: "Hennessy", price: 26.99 };
 const Newport = {
@@ -45,7 +47,7 @@ const Deli = { barcode: 15, type: "food", label: "Deli", price: 5.99 };
 
 let video: any;
 let imageUpload: any;
-let res : any;
+let res: any;
 
 const Checkout = () => {
   const numberFormat = (value: number) =>
@@ -133,15 +135,15 @@ const Checkout = () => {
       }
       console.log("inside alc");
       return (
-        <Dialog open={time > 0}>Starting Age Verification Now: {time}</Dialog>
+        <Dialog open={time > 0}>Starting Age Verification Now: {time} </Dialog>
       );
     }
   };
   useEffect(() => {
     if (currentItem.label !== "none") {
-      if (!needToCheck &&
-        (currentItem.type === "Alcohol" ||
-        currentItem.type === "Cigarrettes")
+      if (
+        !needToCheck &&
+        (currentItem.type === "Alcohol" || currentItem.type === "Cigarrettes")
       ) {
         setRestricted(true);
         reset();
@@ -157,14 +159,23 @@ const Checkout = () => {
       }
     }
   }, [dummy]);
-  
+
   useEffect(() => {
-    if (res !== undefined && res === 'Karan') { additems((arr) => [...arr, currentItem]); setNeedToCheck(true);};
+    if (res !== undefined && res === "Karan") {
+      additems((arr) => [...arr, currentItem]);
+      setNeedToCheck(true);
+    }
     // setTimeout(() => {
   }, [res]);
   return (
     <Box sx={{ backgroundColor: "#DAEAF9", height: "100vh" }}>
       {restricted && checkID()}
+      <Dialog open={needToCheck && !buttonClose} >
+        <Button onClick={() => (buttonClose = true)} >
+          Age has been Verified <CheckCircleSharpIcon />        Tap to Continue
+
+        </Button>
+      </Dialog>
       <Stack
         direction="row"
         style={{ alignItems: "center", justifyContent: "center" }}
