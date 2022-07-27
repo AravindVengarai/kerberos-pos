@@ -46,6 +46,7 @@ const itemArray = [Patron, Henny, Newport, Powerade, Deli];
 let video: any;
 let imageUpload: any;
 let labels: string[];
+let base64: any = [];
 
 const Checkout = () => {
   const numberFormat = (value: number) =>
@@ -156,6 +157,14 @@ const Checkout = () => {
     }
   }, [dummy]);
 
+  const settingPictures = (result: any) => {
+    base64.append(result.images);
+    console.log(base64);
+    // I need the name for the userID
+    // append the name in the labels Array
+    // convert the base64 image -> "1.jpg", "2.jpg" and store it public/labeled_images/$(name)/$(number).jpg
+  }
+
   return (
     <Box>
       {restricted && checkID()}
@@ -194,11 +203,10 @@ const Checkout = () => {
             <ButtonGroup>
               <Button
                 style={{ width: "97px" }}
-                onClick={() => {
+                onClick={async () => {
                   setLoyal(false);
-                  console.log('loyalityd id in bytton');
-                  console.log(loyaltyId);
-                  getUserInfo(loyaltyId);
+                  const result = await getUserInfo(loyaltyId);
+                  settingPictures(result);
                   setisLoyal(true);
                 }}
               >

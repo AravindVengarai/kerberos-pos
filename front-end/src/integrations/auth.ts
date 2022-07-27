@@ -12,6 +12,7 @@ export async function getUserInfo(loyaltyID: string) {
       },
   });
   console.log(response.data.document);
+  return response.data.document;
   }
   catch(error : any ) {
     console.log('something went wrong in the userInfo API call');
