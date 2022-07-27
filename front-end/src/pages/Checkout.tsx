@@ -3,25 +3,23 @@ import {
   Button,
   Box,
   Link as Linker,
-  Paper,
-  List,
   Stack,
   Typography,
-  Grid,
   ButtonGroup,
   TextField,
-  Icon,
   Dialog,
 } from "@mui/material";
+import faceapi from 'face-api.js';
 import 'react-simple-keyboard/build/css/index.css';
 import Keyboard from "react-simple-keyboard";
 import LiquorIcon from "@mui/icons-material/Liquor";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import Webcam from "react-webcam";
+// import Webcam from "react-webcam";
 import Order from "../Components/Order";
 import LocalDrinkIcon from "@mui/icons-material/LocalDrink";
 import SmokingRoomsIcon from "@mui/icons-material/SmokingRooms";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
+import start from '../../public/js/script';
 export interface itemObject {
   barcode?: number;
   type?: string;
@@ -33,6 +31,7 @@ const Henny = { barcode: 12, type: "Alcohol", label: "Hennessy", price: 26.99 };
 const Newport = { barcode: 13, type: "Cigarrettes", label: "Newports", price: 8.99 };
 const Powerade =  { barcode: 14, type: "Drink", label: "Powerade", price: 1.99 };
 const Deli =  { barcode: 15, type: "food", label: "Deli", price: 5.99 };
+
 
 
 const Checkout = () => {
@@ -66,11 +65,13 @@ const Checkout = () => {
     }
     setTotal(cnt);
   }, [items]);
+
   useEffect(() => {
     // if(currentItem.type === 'Alcohol' || currentItem.type === 'Cigarrettes') {
   
     // }
   }, [currentItem]);
+
   return (
     <Box>
       <Stack style={{ alignItems: "center" }}>
@@ -179,7 +180,6 @@ const Checkout = () => {
             marginRight: 0,
           }}
         >
-          <Webcam />
           <Typography style={{ fontSize: "20px", color: "#1b76d4" }}>
             Number of Items in <ShoppingCartIcon />: {items.length - 1}
           </Typography>

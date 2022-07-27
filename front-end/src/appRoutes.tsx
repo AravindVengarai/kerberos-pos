@@ -1,4 +1,4 @@
-import Checkout from "../src/pages/checkout";
+import Checkout from "../src/pages/Checkout";
 import React from "react";
 import { RouteObject } from "react-router-dom";
 import App from "./App";
