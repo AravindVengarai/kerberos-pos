@@ -19,6 +19,7 @@ import Order from "../Components/Order";
 import LocalDrinkIcon from "@mui/icons-material/LocalDrink";
 import SmokingRoomsIcon from "@mui/icons-material/SmokingRooms";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
+import { getThemeProps } from "@mui/system";
 
 export interface itemObject {
   barcode?: number;
@@ -78,12 +79,15 @@ const numberFormat = (value: number) =>
   const [toggle, setToggle] = useState(false);
 
   const getPicture = async () => {
+    let temp = document.createElement('a');
     video = ref.current;
     const myCanvas: any = document.createElement('canvas');
-    myCanvas.getContext('2d').drawImage(video, 0, 0, 720, 550);
-    myCanvas.toBlob(function(blob: any) {
+    myCanvas.getContext('2d').drawImage(video, 0, 0, video.width, video.height);
+    const mblob = myCanvas.toBlob(function(blob: Blob) {
 				imageUpload = new File([blob], 'test.jpg', { type: 'image/jpeg' });
 			}, 'image/jpeg');
+    temp.setAttribute('href', URL.createObjectURL(mblob));
+    temp.setAttribute('download', 'trial.jpeg');
     console.log('imageUpload in getPicture');
     console.log(imageUpload);
   }
@@ -310,6 +314,7 @@ export default Checkout;
 
 async function start() {
   const container = document.createElement('div')
+  container.setAttribute('id', 'top-container');
   container.style.position = 'relative'
   document.body.append(container)
   const labeledFaceDescriptors = await loadLabeledImages()
@@ -320,10 +325,14 @@ async function start() {
   if (image) image.remove()
   if (canvas) canvas.remove()
   image = await faceapi.bufferToImage(imageUpload);
+  console.log('image_upload in start');
+  console.log(imageUpload);
+  image.setAttribute('id', 'bottom-image');
   image.style.width = '720px';
   image.style.height = '550px';
   container.append(image)
   canvas = faceapi.createCanvasFromMedia(image)
+  canvas.setAttribute('id', 'bottom-canvas');
   container.append(canvas)
   const displaySize = { width: image.width, height: image.height }
   faceapi.matchDimensions(canvas, displaySize)
