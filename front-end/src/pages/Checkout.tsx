@@ -81,6 +81,8 @@ let imageUpload: any;
 let labels: string[];
 let base64: any = [];
 let res: any;
+let userName: string;
+let imageArray: any = [];
 
 const Checkout = () => {
   const numberFormat = (value: number) =>
@@ -137,7 +139,6 @@ const Checkout = () => {
       faceapi.nets.ssdMobilenetv1.loadFromUri("/models"), //heavier/accurate version of tiny face detector
     ]).then(startML);
   };
-
 
   useEffect(() => {
     video = ref.current;
@@ -201,26 +202,73 @@ const Checkout = () => {
     }
   }, [dummy]);
 
-  const settingPictures = (result: any) => {
-    base64.append(result.images);
-    console.log(base64);
-    // I need the name for the userID
-    // append the name in the labels Array
-    // convert the base64 image -> "1.jpg", "2.jpg" and store it public/labeled_images/$(name)/$(number).jpg
+  const settingPictures = async (result: any) => {
+    userName = result.name;
+    console.log("in setting picture");
+    result.images.forEach((pic: any) => base64.push(pic));
+    console.log("trial");
+    base64.forEach(async (el: any) => {
+      const blob = b64toBlob(el, "image/jpeg");
+      console.log("blob");
+      console.log(blob);
+      const file = new File([blob], "test.jpg", { type: "image/jpeg" });
+      console.log("file");
+      console.log(file);
+      const image = await faceapi.bufferToImage(file);
+      console.log("image");
+      console.log(image);
+      imageArray.push(image);
+    });
   };
 
+  const b64toBlob = (
+    b64Data: any,
+    contentType = "image/jpeg",
+    sliceSize = 512
+  ) => {
+    const byteCharacters = atob(b64Data);
+    const byteArrays = [];
+
+    for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+      const slice = byteCharacters.slice(offset, offset + sliceSize);
+      const byteNumbers = new Array(slice.length);
+      for (let i = 0; i < slice.length; i++) {
+        byteNumbers[i] = slice.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      byteArrays.push(byteArray);
+    }
+    const blob = new Blob(byteArrays, { type: contentType });
+    return blob;
+  };
+  const mounted = useRef(false);
   useEffect(() => {
-    if (res !== undefined && res === "Karan") {
-      if(!payNowCheck) additems((arr) => [...arr, currentItem]);
+    if (!mounted.current) {
+      mounted.current = true;
+      return;
+    }
+    // let check = false;
+    // res.map((item:any) => (check ||= item.label === userName));
+    if (res !== undefined && res.label === userName && res.age >= 21) {
+      additems((arr) => [...arr, currentItem]);
       setNeedToCheck(true);
       setOpenDialog(true);
+    } else {
+      console.log("You are underage!");
+      setOpenDialog(true);
+      setNeedToCheck(false);
+      return;
     }
-    if (res !== undefined && res !== "Karan") {
+    if (res !== undefined && res !== userName) {
+      if (res.age < 21) {
+        console.log("You are underage!");
+      }
       setOpenDialog(true);
       setNeedToCheck(false);
     }
     // setTimeout(() => {
   }, [res]);
+
   return (
     <Box sx={{ backgroundColor: "#FFFFED", height: "100vh" }}>
       {restricted && checkID()}
@@ -377,7 +425,6 @@ const Checkout = () => {
               onClick={() => {
                 setToggle((prev) => !prev);
                 // setPayNowCheck(true);
-            
               }}
             >
               Pay Now {numberFormat(total)}
@@ -430,37 +477,23 @@ async function startML() {
 
   console.log("results");
   console.log(results);
-  res = results[0].label;
+  res = results[0];
 }
 
 const loadLabeledImages = () => {
-  labels = [
-    "Karan",
-    "Thanasis",
-    "Ankit",
-    "Aravind",
-    "Black Widow",
-    "Captain America",
-    "Captain Marvel",
-    "Hawkeye",
-    "Jim Rhodes",
-    "Thor",
-    "Tony Stark",
-  ];
+  console.log("image array in loaded");
+  console.log(imageArray);
   return Promise.all(
-    labels.map(async (label) => {
+    imageArray.map(async (img: any) => {
       const descriptions = [];
-      for (let i = 1; i <= 2; i++) {
-        const img = await faceapi.fetchImage(
-          `../labeled_images/${label}/${i}.jpg`
-        );
-        const detections = await faceapi
-          .detectSingleFace(img)
-          .withFaceLandmarks()
-          .withFaceDescriptor();
-        if (detections?.descriptor) descriptions.push(detections.descriptor);
-      }
-      return new faceapi.LabeledFaceDescriptors(label, descriptions);
+      const realImg = new Image();
+      realImg.src = img.currentSrc;
+      const detections = await faceapi
+        .detectSingleFace(realImg)
+        .withFaceLandmarks()
+        .withFaceDescriptor();
+      if (detections?.descriptor) descriptions.push(detections.descriptor);
+      return new faceapi.LabeledFaceDescriptors(userName, descriptions);
     })
   );
 };
