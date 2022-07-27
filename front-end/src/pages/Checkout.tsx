@@ -8,6 +8,7 @@ import {
   ButtonGroup,
   TextField,
   Dialog,
+  fabClasses,
 } from "@mui/material";
 import * as faceapi from "face-api.js";
 import "react-simple-keyboard/build/css/index.css";
@@ -92,7 +93,11 @@ const Checkout = () => {
     canvas.toBlob(function (blob: any) {
       imageUpload = new File([blob], "test.jpg", { type: "image/jpeg" });
     }, "image/jpeg");
-    startML();
+    Promise.all([
+      faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
+      faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
+      faceapi.nets.ssdMobilenetv1.loadFromUri("/models"), //heavier/accurate version of tiny face detector
+    ]).then(startML);
   };
 
   useEffect(() => {
@@ -140,15 +145,7 @@ const Checkout = () => {
         setRestricted(true);
         reset();
         start();
-        Promise.all([
-          faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
-          faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
-          faceapi.nets.ssdMobilenetv1.loadFromUri("/models"), //heavier/accurate version of tiny face detector
-        ]);
         checkID();
-        // if (time === 0) {
-        //   additems((arr) => [...arr, currentItem]);
-        // }
       } else {
         additems((arr) => [...arr, currentItem]);
       }
@@ -156,7 +153,7 @@ const Checkout = () => {
   }, [dummy]);
 
   return (
-    <Box>
+    <Box sx={{ backgroundColor: "#DAEAF9", height: "100vh" }}>
       {restricted && checkID()}
       <Stack
         direction="row"
@@ -346,7 +343,7 @@ async function startML() {
     drawBox.draw(canvas);
   });
 
-  console.log('results');
+  console.log("results");
   console.log(results);
 }
 
