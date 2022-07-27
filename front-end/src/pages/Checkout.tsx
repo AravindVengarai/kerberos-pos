@@ -25,7 +25,8 @@ import Order from "../Components/Order";
 import LocalDrinkIcon from "@mui/icons-material/LocalDrink";
 import SmokingRoomsIcon from "@mui/icons-material/SmokingRooms";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
-import { getUserInfo } from '../integrations/auth';
+import { getUserInfo } from "../integrations/auth";
+import { RestartAltTwoTone } from "@mui/icons-material";
 
 export interface itemObject {
   barcode?: number;
@@ -35,15 +36,45 @@ export interface itemObject {
 }
 const Patron = { barcode: 11, type: "Alcohol", label: "Patron", price: 29.99 };
 const Henny = { barcode: 12, type: "Alcohol", label: "Hennessy", price: 26.99 };
+const Chicken = {
+  barcode: 11,
+  type: "Grocery",
+  label: "Chicken",
+  price: 10.99,
+};
+const Napkins = { barcode: 12, type: "Grocery", label: "Napkins", price: 4.99 };
+const Cherries = {
+  barcode: 11,
+  type: "Grocery",
+  label: "Cherries",
+  price: 3.99,
+};
+
 const Newport = {
   barcode: 13,
   type: "Cigarrettes",
   label: "Newports",
   price: 8.99,
 };
+const Spinach = {
+  barcode: 18,
+  type: "Grocery",
+  label: "Spinach",
+  price: 5.99,
+};
 const Powerade = { barcode: 14, type: "Drink", label: "Powerade", price: 1.99 };
 const Deli = { barcode: 15, type: "food", label: "Deli", price: 5.99 };
-const itemArray = [Patron, Henny, Newport, Powerade, Deli];
+const itemArray = [
+  Patron,
+  Henny,
+  Newport,
+  Powerade,
+  Deli,
+  Spinach,
+  Chicken,
+  Napkins,
+  Cherries,
+];
 
 let video: any;
 let imageUpload: any;
@@ -57,6 +88,7 @@ const Checkout = () => {
       style: "currency",
       currency: "USD",
     }).format(value);
+  const [payNowCheck, setPayNowCheck] = useState(false);
   const [needToCheck, setNeedToCheck] = useState(false);
   const [loyal, setLoyal] = useState(false);
   const [total, setTotal] = useState(0);
@@ -106,13 +138,6 @@ const Checkout = () => {
     ]).then(startML);
   };
 
-  useEffect(() => {
-    if (toggle) {
-      getPicture();
-      console.log("made it");
-      setToggle(false);
-    }
-  }, [toggle]);
 
   useEffect(() => {
     video = ref.current;
@@ -143,6 +168,19 @@ const Checkout = () => {
     }
   };
   useEffect(() => {
+    if (toggle) {
+      setRestricted(true);
+      reset();
+      start();
+      setNeedToCheck(false);
+      console.log("made it");
+      res = undefined;
+      setPayNowCheck(true);
+      checkID();
+      setToggle(!toggle);
+    }
+  }, [toggle]);
+  useEffect(() => {
     if (currentItem.label !== "none") {
       if (
         !needToCheck &&
@@ -169,11 +207,11 @@ const Checkout = () => {
     // I need the name for the userID
     // append the name in the labels Array
     // convert the base64 image -> "1.jpg", "2.jpg" and store it public/labeled_images/$(name)/$(number).jpg
-  }
+  };
 
   useEffect(() => {
     if (res !== undefined && res === "Karan") {
-      additems((arr) => [...arr, currentItem]);
+      if(!payNowCheck) additems((arr) => [...arr, currentItem]);
       setNeedToCheck(true);
       setOpenDialog(true);
     }
@@ -184,15 +222,18 @@ const Checkout = () => {
     // setTimeout(() => {
   }, [res]);
   return (
-    <Box sx={{ backgroundColor: "#DAEAF9", height: "100vh" }}>
+    <Box sx={{ backgroundColor: "#FFFFED", height: "100vh" }}>
       {restricted && checkID()}
       <Dialog open={openDialog}>
-      {needToCheck?
-        <Button onClick={() => setOpenDialog(false)}>
-          Age has been Verified <CheckCircleSharpIcon /> Tap to Continue
-        </Button>:<Button onClick={() => setOpenDialog(false)}>
-          Age not Verified! Tap to Continue
-        </Button> }
+        {needToCheck ? (
+          <Button onClick={() => setOpenDialog(false)}>
+            Age has been Verified <CheckCircleSharpIcon /> Tap to Continue
+          </Button>
+        ) : (
+          <Button onClick={() => setOpenDialog(false)}>
+            Age not Verified! Tap to Continue
+          </Button>
+        )}
       </Dialog>
       <Stack
         direction="row"
@@ -255,23 +296,22 @@ const Checkout = () => {
         <Grid
           container
           spacing={2}
-          sx={{ ml: "30px", justifyContent: "space-between", mt: '15px'}}
+          sx={{ ml: "30px", justifyContent: "space-between", mt: "15px" }}
         >
           {itemArray.map((item) => {
             return (
-              <Paper variant="elevation" elevation={2} sx={gridPaperStyling}>
+              <Paper variant="elevation" elevation={5} sx={gridPaperStyling}>
                 <Button
-                sx={{ fontSize: "40px", height:'720px' }}
-                onClick={() => {
-                  setDummy(!dummy);
-                  setCurrentItem(item);
-                }}
-              >
-                {item.label}
-                <SmokingRoomsIcon></SmokingRoomsIcon>
-              </Button>
-            </Paper>
-            )
+                  sx={{ fontSize: "40px", height: "720px", color: "white" }}
+                  onClick={() => {
+                    setDummy(!dummy);
+                    setCurrentItem(item);
+                  }}
+                >
+                  {item.label}
+                </Button>
+              </Paper>
+            );
           })}
         </Grid>
         <Stack
@@ -283,34 +323,68 @@ const Checkout = () => {
             marginRight: 0,
           }}
         >
-          <video
-            id="videoInput"
-            width="720"
-            height="550"
-            muted
-            controls
-            autoPlay
-            loop
-            ref={ref}
-          ></video>
+          <Paper
+            variant="elevation"
+            elevation={10}
+            style={{ borderRadius: "50px" }}
+          >
+            <video
+              id="videoInput"
+              width="720"
+              height="550"
+              muted
+              controls
+              autoPlay
+              loop
+              ref={ref}
+              style={{ borderRadius: "50px" }}
+            ></video>
+          </Paper>
         </Stack>
       </Stack>
-      <Box>
-        <Typography style={{ fontSize: "20px", color: "#1b76d4" }}>
-              Number of Items in <ShoppingCartIcon />: {items.length - 1}
-            </Typography>
-            <Order items={items}></Order>
+
+      <Box
+        style={{
+          justifyContent: "flex-end",
+          display: "flex",
+          flexDirection: "row",
+        }}
+      >
+        <Paper variant="elevation" elevation={5} style={{ width: "720px" }}>
+          <Stack direction="column">
+            <Box>
+              <Typography style={{ fontSize: "20px", color: "#1b76d4" }}>
+                Number of Items in <ShoppingCartIcon />: {items.length - 1}
+              </Typography>
+              <Order items={items}></Order>
+            </Box>
+            {/* <Grid
+            style={{
+              justifyContent: "flex-end",
+              display: "flex",
+              flexDirection: "row",
+            }}
+          > */}
             <Button
               style={{
-                backgroundColor: "green",
+                backgroundColor: "#90ee90",
                 color: "white",
                 fontSize: "25px",
                 width: "fit-content",
+                marginRight: "0",
+                marginLeft: "auto",
               }}
-              onClick={() => setToggle((prev) => !prev)}
+              onClick={() => {
+                setToggle((prev) => !prev);
+                // setPayNowCheck(true);
+            
+              }}
             >
               Pay Now {numberFormat(total)}
             </Button>
+            {/* </Grid> */}
+          </Stack>
+        </Paper>
       </Box>
     </Box>
   );
@@ -394,7 +468,8 @@ const loadLabeledImages = () => {
 const gridPaperStyling = {
   flexDirection: "column",
   display: "flex",
-  height: "200px",
+  height: "150px",
   borderRadius: "8px",
   width: "300px",
+  backgroundColor: "#90ee90",
 };
