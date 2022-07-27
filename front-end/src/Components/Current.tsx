@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Paper, Grid, Typography } from "@mui/material";
-const Order = (props: { item: {} }) => {
+const Current = (props: { item: {} }) => {
   return (
     <Paper>
       <Typography>{props.item.toString()}</Typography>
@@ -8,4 +8,4 @@ const Order = (props: { item: {} }) => {
   );
 };
 
-export default Order;
+export default Current;
