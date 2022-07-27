@@ -45,6 +45,7 @@ const Deli = { barcode: 15, type: "food", label: "Deli", price: 5.99 };
 
 let video: any;
 let imageUpload: any;
+let res : any;
 
 const Checkout = () => {
   const numberFormat = (value: number) =>
@@ -138,20 +139,29 @@ const Checkout = () => {
   };
   useEffect(() => {
     if (currentItem.label !== "none") {
-      if (
-        currentItem.type === "Alcohol" ||
-        currentItem.type === "Cigarrettes"
+      if (!needToCheck &&
+        (currentItem.type === "Alcohol" ||
+        currentItem.type === "Cigarrettes")
       ) {
         setRestricted(true);
         reset();
         start();
         checkID();
+        console.log(res);
+        // if (res !== undefined && res === 'Karan') additems((arr) => [...arr, currentItem]);
+        // setTimeout(() => {
+        //   additems((arr) => [...arr, currentItem]);
+        // }, 10000);
       } else {
         additems((arr) => [...arr, currentItem]);
       }
     }
   }, [dummy]);
-
+  
+  useEffect(() => {
+    if (res !== undefined && res === 'Karan') { additems((arr) => [...arr, currentItem]); setNeedToCheck(true);};
+    // setTimeout(() => {
+  }, [res]);
   return (
     <Box sx={{ backgroundColor: "#DAEAF9", height: "100vh" }}>
       {restricted && checkID()}
@@ -345,6 +355,7 @@ async function startML() {
 
   console.log("results");
   console.log(results);
+  res = results[0].label;
 }
 
 const loadLabeledImages = () => {
