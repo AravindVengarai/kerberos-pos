@@ -241,17 +241,28 @@ const Checkout = () => {
     const blob = new Blob(byteArrays, { type: contentType });
     return blob;
   };
-
+  const mounted = useRef(false);
   useEffect(() => {
+    if (!mounted.current) {
+      mounted.current = true;
+      return;
+    }
     // let check = false;
     // res.map((item:any) => (check ||= item.label === userName));
-
-    if (res !== undefined && res === userName) {
+    if (res !== undefined && res.label === userName && res.age >= 21) {
       additems((arr) => [...arr, currentItem]);
       setNeedToCheck(true);
       setOpenDialog(true);
+    } else {
+      console.log("You are underage!");
+      setOpenDialog(true);
+      setNeedToCheck(false);
+      return;
     }
     if (res !== undefined && res !== userName) {
+      if (res.age < 21) {
+        console.log("You are underage!");
+      }
       setOpenDialog(true);
       setNeedToCheck(false);
     }
@@ -466,7 +477,7 @@ async function startML() {
 
   console.log("results");
   console.log(results);
-  res = results[0].label;
+  res = results[0];
 }
 
 const loadLabeledImages = () => {
