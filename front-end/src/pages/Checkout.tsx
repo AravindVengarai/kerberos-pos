@@ -50,6 +50,7 @@ let imageUpload: any;
 let labels: string[];
 let base64: any = [];
 let res: any;
+let userName: string;
 
 const Checkout = () => {
   const numberFormat = (value: number) =>
@@ -164,9 +165,14 @@ const Checkout = () => {
   }, [dummy]);
 
   const settingPictures = (result: any) => {
-    base64.append(result.images);
+    // userName = result.userName;
+    console.log('in setting picture');
+    console.log(result);
+    base64.push(result.images);
+    console.log('base64'); //6942
     console.log(base64);
-    // I need the name for the userID
+    // I need the name for the userID 
+    // Check if name exists in the folder. If it does than you just add to label the name but dont add any new pics cause you have them.
     // append the name in the labels Array
     // convert the base64 image -> "1.jpg", "2.jpg" and store it public/labeled_images/$(name)/$(number).jpg
   }

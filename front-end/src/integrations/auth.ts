@@ -11,7 +11,13 @@ export async function getUserInfo(loyaltyID: string) {
 
       },
   });
-  console.log(response.data.document);
+  console.log('in the api call');
+  if (response) {
+    console.log(response.data.document);
+    return response.data.document;
+  } else {
+    console.log('response is null');
+  }
   return response.data.document;
   }
   catch(error : any ) {
