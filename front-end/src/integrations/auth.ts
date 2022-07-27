@@ -1,18 +1,21 @@
-import { api } from './setupApi';
+import  api  from './setupApi';
 
-async function getUserInfo(loyaltyID: string) {
+export async function getUserInfo(loyaltyID: string) {
   try {
-    const response = api({
-      method: 'post',
-      url: '',
-      data: {
-        loyaltyID: loyaltyID,
-      }
-    });
-    return response;
+    const response: any = await api.post("/api/findOne", {
+      dataSource: "Cluster0",
+      database: "kerberos",
+      collection: "users",
+      filter: {
+          loyalties: {$elemMatch: {loyaltyID: loyaltyID}},
+
+      },
+  });
+  console.log(response.data.document);
   }
   catch(error : any ) {
     console.log('something went wrong in the userInfo API call');
     console.log(error);
+    console.log(error.response);
   }
 }

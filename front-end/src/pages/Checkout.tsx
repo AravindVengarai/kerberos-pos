@@ -23,6 +23,7 @@ import Order from "../Components/Order";
 import LocalDrinkIcon from "@mui/icons-material/LocalDrink";
 import SmokingRoomsIcon from "@mui/icons-material/SmokingRooms";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
+import { getUserInfo } from '../integrations/auth';
 
 export interface itemObject {
   barcode?: number;
@@ -195,6 +196,9 @@ const Checkout = () => {
                 style={{ width: "97px" }}
                 onClick={() => {
                   setLoyal(false);
+                  console.log('loyalityd id in bytton');
+                  console.log(loyaltyId);
+                  getUserInfo(loyaltyId);
                   setisLoyal(true);
                 }}
               >
