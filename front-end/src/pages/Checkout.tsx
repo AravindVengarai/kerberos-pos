@@ -10,9 +10,11 @@ import {
   Dialog,
   Paper,
   Grid,
+  fabClasses,
 } from "@mui/material";
 import * as faceapi from "face-api.js";
 import "react-simple-keyboard/build/css/index.css";
+import CheckCircleSharpIcon from "@mui/icons-material/CheckCircleSharp";
 import NCR_Logo from "../assets/NCR_Logo.svg";
 import { useTimer } from "use-timer";
 import "react-simple-keyboard/build/css/index.css";
@@ -47,6 +49,7 @@ let video: any;
 let imageUpload: any;
 let labels: string[];
 let base64: any = [];
+let res: any;
 
 const Checkout = () => {
   const numberFormat = (value: number) =>
@@ -60,6 +63,7 @@ const Checkout = () => {
   const [isLoyal, setisLoyal] = useState(false);
   const [restricted, setRestricted] = useState(false);
   const [loyaltyId, setLoyaltyId] = useState("");
+  const [openDialog, setOpenDialog] = useState(false);
   const [currentItem, setCurrentItem] = useState({
     barcode: 1,
     type: "none",
@@ -134,23 +138,25 @@ const Checkout = () => {
       }
       console.log("inside alc");
       return (
-        <Dialog open={time > 0}>Starting Age Verification Now: {time}</Dialog>
+        <Dialog open={time > 0}>Starting Age Verification Now: {time} </Dialog>
       );
     }
   };
   useEffect(() => {
     if (currentItem.label !== "none") {
       if (
-        currentItem.type === "Alcohol" ||
-        currentItem.type === "Cigarrettes"
+        !needToCheck &&
+        (currentItem.type === "Alcohol" || currentItem.type === "Cigarrettes")
       ) {
         setRestricted(true);
         reset();
         start();
         checkID();
-        // if (time === 0) {
+        console.log(res);
+        // if (res !== undefined && res === 'Karan') additems((arr) => [...arr, currentItem]);
+        // setTimeout(() => {
         //   additems((arr) => [...arr, currentItem]);
-        // }
+        // }, 10000);
       } else {
         additems((arr) => [...arr, currentItem]);
       }
@@ -165,9 +171,29 @@ const Checkout = () => {
     // convert the base64 image -> "1.jpg", "2.jpg" and store it public/labeled_images/$(name)/$(number).jpg
   }
 
+  useEffect(() => {
+    if (res !== undefined && res === "Karan") {
+      additems((arr) => [...arr, currentItem]);
+      setNeedToCheck(true);
+      setOpenDialog(true);
+    }
+    if (res !== undefined && res !== "Karan") {
+      setOpenDialog(true);
+      setNeedToCheck(false);
+    }
+    // setTimeout(() => {
+  }, [res]);
   return (
-    <Box>
+    <Box sx={{ backgroundColor: "#DAEAF9", height: "100vh" }}>
       {restricted && checkID()}
+      <Dialog open={openDialog}>
+      {needToCheck?
+        <Button onClick={() => setOpenDialog(false)}>
+          Age has been Verified <CheckCircleSharpIcon /> Tap to Continue
+        </Button>:<Button onClick={() => setOpenDialog(false)}>
+          Age not Verified! Tap to Continue
+        </Button> }
+      </Dialog>
       <Stack
         direction="row"
         style={{ alignItems: "center", justifyContent: "center" }}
@@ -330,6 +356,7 @@ async function startML() {
 
   console.log("results");
   console.log(results);
+  res = results[0].label;
 }
 
 const loadLabeledImages = () => {
