@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "kerb-mobile",
+    "slug": "kerb-mobile",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
