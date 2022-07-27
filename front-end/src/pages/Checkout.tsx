@@ -80,12 +80,8 @@ const numberFormat = (value: number) =>
   const [toggle, setToggle] = useState(false);
 
   const getPicture = async () => {
-    //let temp = document.createElement('a');
     video = document.querySelector('#videoInput')
-    console.log('video');
-    console.log(video);
     // video = ref.current;
-    console.log(video);
     let canvas = document.createElement('canvas');
     let ctx = canvas.getContext('2d');
     console.log('ctx');
@@ -96,8 +92,6 @@ const numberFormat = (value: number) =>
     canvas.toBlob(function(blob: any) {
 				imageUpload = new File([blob], 'test.jpg', { type: 'image/jpeg' });
 			}, 'image/jpeg');
-    // temp.setAttribute('href', URL.createObjectURL(mblob));
-    // temp.setAttribute('download', 'trial.jpeg');
     console.log('imageUpload in getPicture');
     console.log(imageUpload);
     Promise.all([
