@@ -7,7 +7,7 @@
 
 # testing
 /coverage
-
+/public/labeled_images
 # production
 /build
 
