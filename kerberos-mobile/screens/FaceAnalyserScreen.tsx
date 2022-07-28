@@ -127,7 +127,9 @@ export default function FaceAnalyser({ navigation, route }: any) {
                   );
                   navigate.navigate("Auth");
                   console.log(response.data);
+                  console.log("After Push");
                 } catch (e: any) {
+                  console.log("Error man");
                   console.log(e.response.data);
                 }
               }}

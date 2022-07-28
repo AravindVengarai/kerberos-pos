@@ -4,7 +4,7 @@ const api = axios.create({
   baseURL: baseUrl,
 });
 import * as FileSystem from "expo-file-system";
-const apiKey = "pZeogloH10BZ744ttg2xxi04nAtbGemh";
+const apiKey = "b9Nrk2L1YegIhbMU3hJWaCo9ucfETYcN";
 
 export default async function ScanId(imageURI: string) {
   const filebase64 = await FileSystem.readAsStringAsync(imageURI, {
