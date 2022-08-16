@@ -1,6 +1,6 @@
 # kerberos
 
-## What we're making: TBD
+## An application that automates the ID verification process at a POS when purchasing age-restricted products.
 
 ## Members:
    - Sumedh Garimella
